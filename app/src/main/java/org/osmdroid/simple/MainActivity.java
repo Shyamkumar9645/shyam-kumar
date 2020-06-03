@@ -14,6 +14,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 
+import com.google.android.gms.location.LocationListener;
+
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderConstants;
@@ -69,6 +71,8 @@ public class MainActivity extends AppCompatActivity {
         IMapController mapController = map.getController();
         mapController.setZoom(9.5);
         GeoPoint startPoint = new GeoPoint(17.5958, 79.9999);
+        LocationManager locationManager = (LocationManager)
+                getSystemService(Context.LOCATION_SERVICE);
         mapController.setCenter(startPoint);
         Marker startMarker = new Marker(map);
         startMarker.setPosition(startPoint);
