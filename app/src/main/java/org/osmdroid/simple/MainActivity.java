@@ -2,26 +2,26 @@ package org.osmdroid.simple;
 
 
 import android.Manifest;
-
 import android.content.Context;
 import android.content.pm.PackageManager;
-
+import android.graphics.Color;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-
-
+import android.view.LayoutInflater;
+import android.view.View;
 
 import org.osmdroid.api.IMapController;
-
 import org.osmdroid.config.Configuration;
+import org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderConstants;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
-
+import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.TilesOverlay;
 
 import java.util.ArrayList;
 
@@ -29,12 +29,13 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     private final int REQUEST_PERMISSIONS_REQUEST_CODE = 1;
-    private MapView map = null;
+    private MapView map ;
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
 
         //handle permissions first, before map is created. not depicted here
 
@@ -50,8 +51,11 @@ public class MainActivity extends AppCompatActivity {
 
         //inflate and create the map
         setContentView(R.layout.activity_main);
+        Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID);
 
-        map = (MapView) findViewById(R.id.map);
+
+
+        map = findViewById(R.id.map);
         map.setTileSource(TileSourceFactory.MAPNIK);
 
         requestPermissionsIfNecessary(new String[]{
@@ -66,16 +70,22 @@ public class MainActivity extends AppCompatActivity {
         mapController.setZoom(9.5);
         GeoPoint startPoint = new GeoPoint(17.5958, 79.9999);
         mapController.setCenter(startPoint);
-
-
-
+        Marker startMarker = new Marker(map);
+        startMarker.setPosition(startPoint);
+        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        map.getOverlays().add(startMarker);
+        startMarker.setIcon(getResources().getDrawable(R.drawable.person));
+        startMarker.setTitle("Start point");
+        map.invalidate();
 
 
 
     }
 
+
+
     @Override
-    public void onResume() {
+    public void onResume () {
         super.onResume();
         //this will refresh the osmdroid configuration on resuming.
         //if you make changes to the configuration, use
@@ -85,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onPause() {
+    public void onPause () {
         super.onPause();
         //this will refresh the osmdroid configuration on resuming.
         //if you make changes to the configuration, use
@@ -95,7 +105,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult ( int requestCode, String[] permissions,
+                                             int[] grantResults){
         ArrayList<String> permissionsToRequest = new ArrayList<>();
         for (int i = 0; i < grantResults.length; i++) {
             permissionsToRequest.add(permissions[i]);
@@ -108,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void requestPermissionsIfNecessary(String[] permissions) {
+    private void requestPermissionsIfNecessary (String[]permissions){
         ArrayList<String> permissionsToRequest = new ArrayList<>();
         for (String permission : permissions) {
             if (ContextCompat.checkSelfPermission(this, permission)
@@ -126,7 +137,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
 }
+
+
+
+
 
 
 
