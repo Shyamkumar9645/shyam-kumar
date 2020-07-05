@@ -13,6 +13,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.location.LocationListener;
 
@@ -23,7 +24,14 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.MinimapOverlay;
+import org.osmdroid.views.overlay.ScaleBarOverlay;
 import org.osmdroid.views.overlay.TilesOverlay;
+import org.osmdroid.views.overlay.compass.CompassOverlay;
+import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
+import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.util.ArrayList;
 
@@ -63,27 +71,68 @@ public class MainActivity extends AppCompatActivity {
         requestPermissionsIfNecessary(new String[]{
                 // if you need to show the current location, uncomment the line below
                 Manifest.permission.ACCESS_FINE_LOCATION,
+                // Manifest.permission.ACCESS_FINE_LOCATION,
                 // WRITE_EXTERNAL_STORAGE is required in order to show the map
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
         });
+
+        //add default Zoom buttons and ability to zoom with 2 fingers(multitouch)
         map.setBuiltInZoomControls(true);
         map.setMultiTouchControls(true);
+
+        //To move the map map on a default view point
         IMapController mapController = map.getController();
         mapController.setZoom(9.5);
         GeoPoint startPoint = new GeoPoint(17.5958, 79.9999);
-        LocationManager locationManager = (LocationManager)
-                getSystemService(Context.LOCATION_SERVICE);
         mapController.setCenter(startPoint);
+
+        //adding map scale bar overlay
+        ScaleBarOverlay scaleBarOverlay = new ScaleBarOverlay(ctx,25,40);
+        scaleBarOverlay.setCentred(true);
+        scaleBarOverlay.setScaleBarOffset(5, 10);
+
+        getSystemService(Context.LOCATION_SERVICE);
+        //mapController.setCenter(startPoint);
+        GpsMyLocationProvider provider = new GpsMyLocationProvider(getApplicationContext());
+        provider.addLocationSource(LocationManager.GPS_PROVIDER);
+
+       //Add Mylocation overlay
+        MyLocationNewOverlay myLocationNewOverlay = new MyLocationNewOverlay(provider, map);
+        myLocationNewOverlay.enableMyLocation();
+        myLocationNewOverlay.enableFollowLocation();
+        myLocationNewOverlay.setOptionsMenuEnabled(true);
+
+        Toast.makeText(getApplicationContext(),"my location "+        provider.getLastKnownLocation()
+                ,Toast.LENGTH_LONG).show();
+
+        //add a compass overlay
+        map.getOverlays().add(myLocationNewOverlay);
+        CompassOverlay compassOverlay= new CompassOverlay(ctx, new InternalCompassOrientationProvider(ctx), map);
+        compassOverlay.enableCompass();
+        map.getOverlays().add(compassOverlay);
+
+        //LatLonGridlineOverlay2 overlay = new LatLonGridlineOverlay2();
+        //map.getOverlays().add(overlay);
+
+        //enable rotation gestures
+        RotationGestureOverlay rotationGestureOverlay=new RotationGestureOverlay(ctx,map);
+        rotationGestureOverlay.setEnabled(true);
+        map.getOverlays().add(rotationGestureOverlay);
+
+        map.setMultiTouchControls(true);
+        map.setFlingEnabled(true);
+
+        MinimapOverlay minimapOverlay=new MinimapOverlay(ctx,map.getTileRequestCompleteHandler());
+
+
+        //adding marker
         Marker startMarker = new Marker(map);
-        startMarker.setPosition(startPoint);
+        //startMarker.setPosition(startPoint);
         startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         map.getOverlays().add(startMarker);
         startMarker.setIcon(getResources().getDrawable(R.drawable.person));
         startMarker.setTitle("Start point");
         map.invalidate();
-
-
-
     }
 
 
