@@ -1,2 +1,1 @@
-# shyam-kumar
-Open Street Map
+# Open Street Map
