@@ -6,3 +6,7 @@ https://user-images.githubusercontent.com/56960288/86536796-069fc900-bf08-11ea-9
 
 <li>Features:</li>
 Works offline, tiles are saved in local database
+
+#guide
+<li> The IDE used is Android Studio</li>
+ 
